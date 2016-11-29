@@ -1,31 +1,18 @@
-#
-# Nginx Dockerfile
-#
-# https://github.com/dockerfile/nginx
-#
+OM nginx:1.9
+MAINTAINER Kyle Mathews "mathews.kyle@gmail.com"
 
-# Pull base image.
-FROM ubuntu:yakkety
+RUN rm /etc/nginx/nginx.conf /etc/nginx/mime.types
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY basic.conf /etc/nginx/basic.conf
+COPY mime.types /etc/nginx/mime.types
+RUN mkdir /etc/nginx/ssl
+COPY default /etc/nginx/sites-enabled/default
+COPY default-ssl /etc/nginx/sites-available/default-ssl
+COPY directive-only /etc/nginx/directive-only
+COPY location /etc/nginx/location
 
-# Install Nginx.
-RUN \
-  apt-get update && \
-  apt-get install -y software-properties-common && \
-  add-apt-repository -y ppa:nginx/stable && \
-  apt-get install -y nginx && \
-  rm -rf /var/lib/apt/lists/* && \
-  echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
-  chown -R www-data:www-data /var/lib/nginx
+# expose both the HTTP (80) and HTTPS (443) ports
+EXPOSE 80 443
 
-# Define mountable directories.
-#VOLUME ["/etc/nginx/sites-enabled", "/etc/nginx/certs", "/etc/nginx/conf.d", "/var/log/nginx", "/var/www/html"]
+CMD ["nginx"]
 
-# Define working directory.
-#WORKDIR /etc/nginx
-
-# Define default command.
-#CMD ["nginx"]
-
-# Expose ports.
-EXPOSE 80
-EXPOSE 443
